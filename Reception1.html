@@ -1,3 +1,4 @@
+<!-- VIDEO PLAYER -->
 <video
     id="videoPlayer"
     autoplay
@@ -5,6 +6,27 @@
     playsinline
     preload="auto">
 </video>
+
+<!-- VIDEO SIZE / RESOLUTION -->
+<style>
+#videoPlayer {
+    width: 100%;
+    max-width: 1280px;
+
+    /* 16:9 video size */
+    aspect-ratio: 16 / 9;
+
+    /* Keep video nicely fitted */
+    object-fit: cover;
+
+    /* Center the video */
+    display: block;
+    margin: 0 auto;
+
+    /* Optional */
+    background: #000;
+}
+</style>
 
 <script>
 const owner = "itallied143";
@@ -14,41 +36,60 @@ const folder = "Video";
 const player = document.getElementById("videoPlayer");
 
 async function loadVideos() {
-    const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/${folder}`
-    );
+    try {
+        const response = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${folder}`
+        );
 
-    const files = await response.json();
-
-    const videos = files
-        .filter(file => file.name.toLowerCase().endsWith(".mp4"))
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(file => file.download_url);
-
-    if (videos.length === 0) return;
-
-    let currentVideo = 0;
-
-    function playVideo() {
-        player.src = videos[currentVideo];
-        player.play().catch(error => {
-            console.log("Autoplay blocked:", error);
-        });
-    }
-
-    // When one video finishes, play the next
-    player.addEventListener("ended", () => {
-        currentVideo++;
-
-        // After last video, go back to first
-        if (currentVideo >= videos.length) {
-            currentVideo = 0;
+        if (!response.ok) {
+            throw new Error("Could not load video folder");
         }
 
-        playVideo();
-    });
+        const files = await response.json();
 
-    playVideo();
+        const videos = files
+            .filter(file =>
+                file.name.toLowerCase().endsWith(".mp4")
+            )
+            .sort((a, b) =>
+                a.name.localeCompare(b.name)
+            )
+            .map(file => file.download_url);
+
+        if (videos.length === 0) {
+            console.log("No videos found.");
+            return;
+        }
+
+        let currentVideo = 0;
+
+        function playVideo() {
+            player.src = videos[currentVideo];
+
+            player.play().catch(error => {
+                console.log("Autoplay blocked:", error);
+            });
+        }
+
+        // When video finishes → play next video
+        player.addEventListener("ended", () => {
+
+            currentVideo++;
+
+            // After last video → start again
+            if (currentVideo >= videos.length) {
+                currentVideo = 0;
+            }
+
+            playVideo();
+        });
+
+        // Start first video
+        playVideo();
+
+    } catch (error) {
+        console.error("Video error:", error);
+    }
 }
 
 loadVideos();
