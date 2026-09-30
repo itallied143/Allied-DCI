@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+
+        /* =========================================
+           PAGE
+        ========================================= */
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        /* =========================================
+           VIDEO
+        ========================================= */
+
+        #videoPlayer {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+
+        /* =========================================
+           MODERN TIME / WEATHER HUD
+        ========================================= */
+
+        #infoPanel {
+
+            position: fixed;
+
+            left: 35px;
+
+            /* LOWER LEFT */
+            bottom: 95px;
+
+            width: 285px;
+
+            padding: 22px 25px;
+
+            background: rgba(8, 18, 32, 0.52);
+
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border: 1px solid rgba(0, 217, 255, 0.30);
+
+            border-radius: 18px;
+
+            color: white;
+
+            z-index: 10;
+
+            box-sizing: border-box;
+
+            box-shadow:
+                0 8px 35px rgba(0, 0, 0, 0.30),
+                inset 0 0 25px rgba(0, 200, 255, 0.04);
+        }
+
+
+        /* SMALL TOP LABEL */
+
+        .panelHeader {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 8px;
+        }
+
+
+        #location {
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            letter-spacing: 3px;
+
+            color: #00d9ff;
+
+            text-transform: uppercase;
+        }
+
+
+        #liveIndicator {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            font-size: 9px;
+
+            letter-spacing: 1px;
+
+            color: rgba(255,255,255,0.65);
+
+            text-transform: uppercase;
+        }
+
+
+        #liveDot {
+
+            width: 6px;
+
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #00eaff;
+
+            box-shadow:
+                0 0 8px #00eaff;
+        }
+
+
+        /* =========================================
+           CLOCK
+        ========================================= */
+
+        #clock {
+
+            font-size: 52px;
+
+            font-weight: 300;
+
+            line-height: 1;
+
+            letter-spacing: 3px;
+
+            color: #ffffff;
+
+            margin-top: 5px;
+
+            white-space: nowrap;
+
+            text-shadow:
+                0 0 15px rgba(0, 217, 255, 0.18);
+        }
+
+
+        /* =========================================
+           DATE
+        ========================================= */
+
+        #date {
+
+            font-size: 13px;
+
+            margin-top: 9px;
+
+            color: rgba(255,255,255,0.68);
+
+            letter-spacing: 0.5px;
+        }
+
+
+        /* =========================================
+           ACCENT LINE
+        ========================================= */
+
+        .accentLine {
+
+            width: 100%;
+
+            height: 1px;
+
+            margin: 17px 0;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #00d9ff,
+                    rgba(0,217,255,0.15),
+                    transparent
+                );
+        }
+
+
+        /* =========================================
+           WEATHER SECTION
+        ========================================= */
+
+        .weatherRow {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+
+        /* WEATHER ICON */
+
+        #weatherIcon {
+
+            font-size: 38px;
+
+            line-height: 1;
+
+            margin-right: 14px;
+
+            filter:
+                drop-shadow(
+                    0 0 8px
+                    rgba(0,217,255,0.20)
+                );
+        }
+
+
+        /* TEMPERATURE */
+
+        #temperature {
+
+            font-size: 40px;
+
+            font-weight: 300;
+
+            line-height: 1;
+
+            color: #00d9ff;
+
+            white-space: nowrap;
+        }
+
+
+        .temperatureLabel {
+
+            font-size: 10px;
+
+            color: rgba(255,255,255,0.50);
+
+            letter-spacing: 2px;
+
+            margin-top: 5px;
+
+            text-transform: uppercase;
+        }
+
+
+        /* WEATHER DETAILS */
+
+        .weatherDetails {
+
+            text-align: right;
+
+            margin-left: auto;
+        }
+
+
+        #condition {
+
+            font-size: 13px;
+
+            color: white;
+
+            margin-bottom: 6px;
+        }
+
+
+        #humidity {
+
+            font-size: 11px;
+
+            color: rgba(255,255,255,0.55);
+        }
+
+
+        /* =========================================
+           BOTTOM CENTER BAR
+        ========================================= */
+
+        #bottomBar {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 25px;
+
+            transform: translateX(-50%);
+
+            width: min(600px, 55vw);
+
+            padding: 11px 20px;
+
+            background: rgba(5, 15, 28, 0.62);
+
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            border: 1px solid rgba(0, 217, 255, 0.35);
+
+            border-radius: 8px;
+
+            color: white;
+
+            text-align: center;
+
+            z-index: 10;
+
+            box-shadow:
+                0 0 25px rgba(0, 180, 255, 0.10);
+
+            box-sizing: border-box;
+        }
+
+
+        .barContent {
+
+            font-size: 12px;
+
+            letter-spacing: 2px;
+
+            white-space: nowrap;
+        }
+
+
+        .barTitle {
+
+            color: #00d9ff;
+
+            font-weight: bold;
+        }
+
+
+        .barDivider {
+
+            margin: 0 12px;
+
+            color: rgba(255,255,255,0.35);
+        }
+
+
+        .barLine {
+
+            height: 1px;
+
+            width: 30px;
+
+            margin: 0 auto 6px auto;
+
+            background: #00d9ff;
+        }
+
+
+        .barLine:last-child {
+
+            margin: 6px auto 0 auto;
+        }
+
+
+        /* =========================================
+           SMALL SCREENS
+        ========================================= */
+
+        @media (max-width: 700px) {
+
+            #infoPanel {
+
+                left: 15px;
+
+                bottom: 80px;
+
+                width: 240px;
+
+                padding: 18px 20px;
+
+                border-radius: 14px;
+            }
+
+
+            #clock {
+
+                font-size: 40px;
+            }
+
+
+            #temperature {
+
+                font-size: 32px;
+            }
+
+
+            #weatherIcon {
+
+                font-size: 30px;
+            }
+
+
+            #bottomBar {
+
+                bottom: 12px;
+
+                width: 85vw;
+
+                padding: 8px;
+            }
+
+
+            .barContent {
+
+                font-size: 8px;
+
+                letter-spacing: 1px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         VIDEO PLAYER
+    ========================================= -->
+
+    <video
+        id="videoPlayer"
+        autoplay
+        muted
+        playsinline
+        preload="auto">
+    </video>
+
+
+
+    <!-- =========================================
+         MODERN TIME + WEATHER PANEL
+    ========================================= -->
+
+    <div id="infoPanel">
+
+        <div class="panelHeader">
+
+            <div id="location">
+                ABU DHABI
+            </div>
+
+            <div id="liveIndicator">
+
+                <span id="liveDot"></span>
+
+                LIVE
+
+            </div>
+
+        </div>
+
+
+        <div id="clock">
+            00:00:00
+        </div>
+
+
+        <div id="date">
+            Loading date...
+        </div>
+
+
+        <div class="accentLine"></div>
+
+
+        <div class="weatherRow">
+
+            <div id="weatherIcon">
+                ☀️
+            </div>
+
+
+            <div>
+
+                <div id="temperature">
+                    --°C
+                </div>
+
+                <div class="temperatureLabel">
+                    Temperature
+                </div>
+
+            </div>
+
+
+            <div class="weatherDetails">
+
+                <div id="condition">
+                    Loading...
+                </div>
+
+                <div id="humidity">
+                    Humidity: --%
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================
+         BOTTOM CENTER ADC BAR
+    ========================================= -->
+
+    <div id="bottomBar">
+
+        <div class="barLine"></div>
+
+        <div class="barContent">
+
+            <span class="barTitle">
+                ALLIED DATA CENTER
+            </span>
+
+            <span class="barDivider">
+                |
+            </span>
+
+            <span>
+                SECURE • RELIABLE • CONNECTED
+            </span>
+
+        </div>
+
+        <div class="barLine"></div>
+
+    </div>
+
+
+
+    <script>
+
+
+        /* =========================================
+           VIDEO PLAYLIST
+        ========================================= */
+
+        const owner = "itallied143";
+
+        const repo = "Allied-DCI";
+
+        const folder = "Video";
+
+        const player =
+            document.getElementById("videoPlayer");
+
+
+        async function loadVideos() {
+
+            try {
+
+                const response = await fetch(
+
+                    `https://api.github.com/repos/${owner}/${repo}/contents/${folder}`
+
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not load video folder"
+                    );
+
+                }
+
+
+                const files =
+                    await response.json();
+
+
+                const videos = files
+
+                    .filter(file =>
+                        file.name
+                            .toLowerCase()
+                            .endsWith(".mp4")
+                    )
+
+                    .sort((a, b) =>
+                        a.name.localeCompare(b.name)
+                    )
+
+                    .map(file =>
+                        file.download_url
+                    );
+
+
+                if (videos.length === 0) {
+
+                    console.log(
+                        "No videos found."
+                    );
+
+                    return;
+                }
+
+
+                let currentVideo = 0;
+
+
+                function playVideo() {
+
+                    player.src =
+                        videos[currentVideo];
+
+
+                    player.play()
+                        .catch(error => {
+
+                            console.log(
+                                "Autoplay blocked:",
+                                error
+                            );
+
+                        });
+
+                }
+
+
+                player.addEventListener(
+                    "ended",
+                    () => {
+
+                        currentVideo++;
+
+                        if (
+                            currentVideo >=
+                            videos.length
+                        ) {
+
+                            currentVideo = 0;
+
+                        }
+
+                        playVideo();
+
+                    }
+                );
+
+
+                playVideo();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Video error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        loadVideos();
+
+
+
+        /* =========================================
+           CLOCK
+        ========================================= */
+
+        function updateClock() {
+
+            const now =
+                new Date();
+
+
+            const time =
+                now.toLocaleTimeString(
+                    "en-AE",
+                    {
+                        timeZone:
+                            "Asia/Dubai",
+
+                        hour:
+                            "2-digit",
+
+                        minute:
+                            "2-digit",
+
+                        second:
+                            "2-digit",
+
+                        hour12:
+                            false
+                    }
+                );
+
+
+            const date =
+                now.toLocaleDateString(
+                    "en-AE",
+                    {
+                        timeZone:
+                            "Asia/Dubai",
+
+                        weekday:
+                            "long",
+
+                        day:
+                            "2-digit",
+
+                        month:
+                            "long",
+
+                        year:
+                            "numeric"
+                    }
+                );
+
+
+            document.getElementById(
+                "clock"
+            ).textContent = time;
+
+
+            document.getElementById(
+                "date"
+            ).textContent = date;
+
+        }
+
+
+        updateClock();
+
+        setInterval(
+            updateClock,
+            1000
+        );
+
+
+
+        /* =========================================
+           WEATHER
+           ABU DHABI
+        ========================================= */
+
+        async function loadWeather() {
+
+            try {
+
+                const response =
+                    await fetch(
+
+                        "https://api.open-meteo.com/v1/forecast?latitude=24.4539&longitude=54.3773&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia%2FDubai"
+
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Weather unavailable"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                const current =
+                    data.current;
+
+
+                /* TEMPERATURE */
+
+                document.getElementById(
+                    "temperature"
+                ).textContent =
+
+                    Math.round(
+                        current.temperature_2m
+                    ) + "°C";
+
+
+                /* HUMIDITY */
+
+                document.getElementById(
+                    "humidity"
+                ).textContent =
+
+                    "Humidity: " +
+
+                    Math.round(
+                        current.relative_humidity_2m
+                    ) +
+
+                    "%";
+
+
+                /* WEATHER CONDITION */
+
+                const weatherCode =
+                    current.weather_code;
+
+
+                let condition =
+                    "Clear Sky";
+
+                let icon =
+                    "☀️";
+
+
+                if (weatherCode === 0) {
+
+                    condition =
+                        "Clear Sky";
+
+                    icon =
+                        "☀️";
+
+                }
+
+                else if (
+                    weatherCode === 1 ||
+                    weatherCode === 2
+                ) {
+
+                    condition =
+                        "Partly Cloudy";
+
+                    icon =
+                        "🌤️";
+
+                }
+
+                else if (
+                    weatherCode === 3
+                ) {
+
+                    condition =
+                        "Cloudy";
+
+                    icon =
+                        "☁️";
+
+                }
+
+                else if (
+                    weatherCode >= 45 &&
+                    weatherCode <= 48
+                ) {
+
+                    condition =
+                        "Foggy";
+
+                    icon =
+                        "🌫️";
+
+                }
+
+                else if (
+                    weatherCode >= 51 &&
+                    weatherCode <= 67
+                ) {
+
+                    condition =
+                        "Rain";
+
+                    icon =
+                        "🌧️";
+
+                }
+
+                else if (
+                    weatherCode >= 80 &&
+                    weatherCode <= 82
+                ) {
+
+                    condition =
+                        "Rain Showers";
+
+                    icon =
+                        "🌦️";
+
+                }
+
+                else if (
+                    weatherCode >= 95
+                ) {
+
+                    condition =
+                        "Thunderstorm";
+
+                    icon =
+                        "⛈️";
+
+                }
+
+
+                document.getElementById(
+                    "condition"
+                ).textContent =
+                    condition;
+
+
+                document.getElementById(
+                    "weatherIcon"
+                ).textContent =
+                    icon;
+
+
+            }
+
+            catch (error) {
+
+                console.log(
+                    "Weather error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "condition"
+                ).textContent =
+                    "Weather unavailable";
+
+            }
+
+        }
+
+
+        /* INITIAL WEATHER */
+
+        loadWeather();
+
+
+        /* REFRESH EVERY 10 MINUTES */
+
+        setInterval(
+            loadWeather,
+            600000
+        );
+
+
+    </script>
+
+
+</body>
+</html>
