@@ -49,7 +49,7 @@
             /* LOWER LEFT */
             bottom: 95px;
 
-            width: 285px;
+            width: 315px;
 
             padding: 22px 25px;
 
@@ -141,7 +141,7 @@
 
         #clock {
 
-            font-size: 52px;
+            font-size: 47px;
 
             font-weight: 300;
 
@@ -432,7 +432,7 @@
 
                 bottom: 80px;
 
-                width: 240px;
+                width: 270px;
 
                 padding: 18px 20px;
 
@@ -442,7 +442,7 @@
 
             #clock {
 
-                font-size: 40px;
+                font-size: 36px;
             }
 
 
@@ -607,6 +607,10 @@
 
                 <span class="currencyItem" data-currency="EGP">
                     🇪🇬 EGP <strong>1 AED =</strong> <span id="egpRate" class="rateValue">--</span>
+                </span>
+
+                <span class="currencyItem" data-currency="MAD">
+                    🇲🇦 MAD <strong>1 AED =</strong> <span id="madRate" class="rateValue">--</span>
                 </span>
 
             </span>
@@ -776,7 +780,7 @@
                             "2-digit",
 
                         hour12:
-                            false
+                            true
                     }
                 );
 
@@ -1068,6 +1072,9 @@
 
                 document.getElementById("egpRate").textContent =
                     rates.EGP ? rates.EGP.toFixed(2) : "--";
+
+                document.getElementById("madRate").textContent =
+                    rates.MAD ? rates.MAD.toFixed(2) : "--";
 
 
             } catch (error) {
