@@ -49,7 +49,7 @@
             /* LOWER LEFT */
             bottom: 95px;
 
-            width: 315px;
+            width: 285px;
 
             padding: 22px 25px;
 
@@ -141,6 +141,12 @@
 
         #clock {
 
+            display: flex;
+
+            align-items: baseline;
+
+            justify-content: flex-start;
+
             font-size: 40px;
 
             font-weight: 300;
@@ -155,8 +161,53 @@
 
             white-space: nowrap;
 
+            font-variant-numeric: tabular-nums;
+
+            font-feature-settings: "tnum";
+
             text-shadow:
                 0 0 15px rgba(0, 217, 255, 0.18);
+        }
+
+        #clockHour,
+        #clockMinute,
+        #clockSecond {
+
+            display: inline-block;
+
+            width: 52px;
+
+            text-align: center;
+
+            flex-shrink: 0;
+        }
+
+        .clockColon {
+
+            display: inline-block;
+
+            width: 18px;
+
+            text-align: center;
+
+            flex-shrink: 0;
+        }
+
+        #clockPeriod {
+
+            display: inline-block;
+
+            width: 42px;
+
+            margin-left: 8px;
+
+            text-align: left;
+
+            font-size: 0.55em;
+
+            letter-spacing: 1px;
+
+            flex-shrink: 0;
         }
 
 
@@ -432,7 +483,7 @@
 
                 bottom: 80px;
 
-                width: 270px;
+                width: 240px;
 
                 padding: 18px 20px;
 
@@ -443,6 +494,18 @@
             #clock {
 
                 font-size: 32px;
+            }
+
+            #clockTime {
+
+                width: 150px;
+            }
+
+            #clockPeriod {
+
+                width: 34px;
+
+                margin-left: 5px;
             }
 
 
@@ -521,7 +584,12 @@
 
 
         <div id="clock">
-            00:00:00
+            <span id="clockHour">00</span>
+            <span class="clockColon">:</span>
+            <span id="clockMinute">00</span>
+            <span class="clockColon">:</span>
+            <span id="clockSecond">00</span>
+            <span id="clockPeriod">PM</span>
         </div>
 
 
@@ -607,10 +675,6 @@
 
                 <span class="currencyItem" data-currency="EGP">
                     🇪🇬 EGP <strong>1 AED =</strong> <span id="egpRate" class="rateValue">--</span>
-                </span>
-
-                <span class="currencyItem" data-currency="MAD">
-                    🇲🇦 MAD <strong>1 AED =</strong> <span id="madRate" class="rateValue">--</span>
                 </span>
 
             </span>
@@ -807,9 +871,25 @@
                 );
 
 
+            const timeParts = time.split(" ");
+
+            const clockParts = timeParts[0].split(":");
+
             document.getElementById(
-                "clock"
-            ).textContent = time;
+                "clockHour"
+            ).textContent = clockParts[0];
+
+            document.getElementById(
+                "clockMinute"
+            ).textContent = clockParts[1];
+
+            document.getElementById(
+                "clockSecond"
+            ).textContent = clockParts[2];
+
+            document.getElementById(
+                "clockPeriod"
+            ).textContent = timeParts[1] || "";
 
 
             document.getElementById(
@@ -1072,9 +1152,6 @@
 
                 document.getElementById("egpRate").textContent =
                     rates.EGP ? rates.EGP.toFixed(2) : "--";
-
-                document.getElementById("madRate").textContent =
-                    rates.MAD ? rates.MAD.toFixed(2) : "--";
 
 
             } catch (error) {
