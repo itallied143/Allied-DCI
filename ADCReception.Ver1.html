@@ -79,7 +79,24 @@
         }
 
 
-        /* SMALL TOP LABEL */
+        /* =========================================
+           AUTO HIDE HUD AFTER 30 SECONDS
+        ========================================= */
+        #infoPanel,
+        #bottomBar {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        #infoPanel.hudHidden,
+        #bottomBar.hudHidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+                /* SMALL TOP LABEL */
 
         .panelHeader {
 
@@ -720,6 +737,29 @@
         const player =
             document.getElementById("videoPlayer");
 
+        /* =========================================
+           HUD VISIBILITY
+           Show at the beginning of each video,
+           then fade out after 30 seconds.
+        ========================================= */
+
+        const infoPanel = document.getElementById("infoPanel");
+        const bottomBar = document.getElementById("bottomBar");
+
+        let hudHideTimer = null;
+
+        function showHud() {
+            infoPanel.classList.remove("hudHidden");
+            bottomBar.classList.remove("hudHidden");
+
+            clearTimeout(hudHideTimer);
+
+            hudHideTimer = setTimeout(() => {
+                infoPanel.classList.add("hudHidden");
+                bottomBar.classList.add("hudHidden");
+            }, 30000);
+        }
+
 
         async function loadVideos() {
 
@@ -776,6 +816,10 @@
 
 
                 function playVideo() {
+
+                    /* Show clock/weather and currency again
+                       whenever a new video starts */
+                    showHud();
 
                     player.src =
                         videos[currentVideo];
