@@ -1,0 +1,867 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#fff
+}
+
+/* TOP SECTION */
+#topSection{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:82px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 18px;
+  background:rgba(8,18,32,.38);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:0;
+  box-shadow:0 8px 30px rgba(0,0,0,.28),
+             0 0 30px rgba(0,180,255,.10);
+  z-index:9999
+}
+
+.infoBox{
+  height:58px;
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  padding:0 24px
+}
+
+.divider{
+  width:1px;
+  height:46px;
+  background:rgba(0,217,255,.25);
+  flex-shrink:0
+}
+
+.label{
+  font-size:9px;
+  font-weight:bold;
+  letter-spacing:2px;
+  color:#00d9ff;
+  white-space:nowrap
+}
+
+.value{
+  margin-top:3px;
+  font-size:25px;
+  font-weight:300;
+  line-height:1;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums
+}
+
+.subvalue{
+  margin-top:3px;
+  font-size:8px;
+  color:rgba(255,255,255,.62);
+  white-space:nowrap
+}
+
+#clock{
+  display:flex;
+  align-items:baseline;
+  font-size:25px;
+  letter-spacing:1px;
+  font-variant-numeric:tabular-nums
+}
+
+.clockPart{
+  display:inline-block;
+  width:34px;
+  text-align:center
+}
+
+.clockColon{
+  display:inline-block;
+  width:8px;
+  text-align:center
+}
+
+#period{
+  display:inline-block;
+  width:30px;
+  margin-left:4px;
+  text-align:left;
+  font-size:.43em;
+  letter-spacing:1px
+}
+
+#temperature{
+  display:inline-block;
+  width:86px;
+  text-align:center
+}
+
+#currencyValue{
+  display:inline-block;
+  width:210px;
+  text-align:center;
+  font-size:15px;
+  letter-spacing:.2px;
+  font-variant-numeric:tabular-nums
+}
+
+
+/* VIDEO SECTION */
+
+#videoSection{
+  position:fixed;
+  top:82px;
+  left:0;
+  width:100%;
+  height:calc(100vh - 112px);
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden
+}
+
+
+/* BLURRED VIDEO BACKGROUND */
+
+#videoBackground{
+  position:absolute;
+  top:-8%;
+  left:-8%;
+  width:116%;
+  height:116%;
+  object-fit:cover;
+  object-position:center center;
+  filter:blur(35px);
+  transform:scale(1.08);
+  opacity:.75;
+  z-index:0;
+}
+
+
+/* DARK OVERLAY ON BLURRED BACKGROUND */
+
+#videoBackgroundOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.30);
+  z-index:1;
+}
+
+
+/* MAIN VIDEO - NOT CROPPED */
+
+#videoPlayer{
+  position:relative;
+  z-index:2;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center center;
+  border:0;
+  margin:0;
+  padding:0
+}
+
+
+/* BOTTOM BLACK SECTION */
+
+#bottomSection{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:30px;
+  background:#000;
+  z-index:9999
+}
+
+
+/* TEMPERATURE ICON */
+
+#tempIcon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  line-height:1;
+  margin-right:4px;
+  vertical-align:middle;
+  filter:drop-shadow(0 0 5px rgba(0,217,255,.25))
+}
+
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+  #topSection{
+    height:68px;
+    padding:4px 6px
+  }
+
+  .infoBox{
+    min-width:0;
+    flex:1;
+    padding:0 6px;
+    height:52px
+  }
+
+  .divider{
+    height:40px
+  }
+
+  .label{
+    font-size:7px;
+    letter-spacing:1px
+  }
+
+  .value,
+  #clock{
+    font-size:19px
+  }
+
+  .clockPart{
+    width:27px
+  }
+
+  .clockColon{
+    width:6px
+  }
+
+  #period{
+    width:25px;
+    margin-left:2px
+  }
+
+  #temperature{
+    width:70px
+  }
+
+  #currencyValue{
+    width:150px;
+    font-size:11px
+  }
+
+  #videoSection{
+    top:68px;
+    height:calc(100vh - 98px)
+  }
+
+  #bottomSection{
+    height:30px
+  }
+
+  #videoBackground{
+    filter:blur(25px);
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- TOP INFORMATION SECTION -->
+
+<div id="topSection">
+
+  <div class="infoBox">
+
+    <div class="label">
+      WEATHER
+    </div>
+
+    <div class="value">
+      <span id="tempIcon" aria-hidden="true">☀️</span>
+      <span id="temperature">--°C</span>
+    </div>
+
+    <div id="weatherStatus" class="subvalue">
+      Abu Dhabi · Loading weather...
+    </div>
+
+  </div>
+
+
+  <div class="divider"></div>
+
+
+  <div class="infoBox">
+
+    <div class="label">
+      ABU DHABI <span style="color:#00eaff">●</span> LIVE
+    </div>
+
+    <div id="clock">
+
+      <span id="clockHour" class="clockPart">00</span>
+
+      <span class="clockColon">:</span>
+
+      <span id="clockMinute" class="clockPart">00</span>
+
+      <span class="clockColon">:</span>
+
+      <span id="clockSecond" class="clockPart">00</span>
+
+      <span id="period">PM</span>
+
+    </div>
+
+    <div id="date" class="subvalue">
+      Loading date...
+    </div>
+
+  </div>
+
+
+  <div class="divider"></div>
+
+
+  <div class="infoBox">
+
+    <div class="label" id="currencyLabel">
+      EXCHANGE RATE
+    </div>
+
+    <div class="value">
+
+      <span id="currencyValue">
+        1 AED = USD --
+      </span>
+
+    </div>
+
+    <div class="subvalue">
+      Live reference rate
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- VIDEO AREA -->
+
+<div id="videoSection">
+
+  <!-- BLURRED BACKGROUND VIDEO -->
+  <video
+    id="videoBackground"
+    muted
+    autoplay
+    loop
+    playsinline
+    preload="auto">
+  </video>
+
+  <!-- DARKENING LAYER -->
+  <div id="videoBackgroundOverlay"></div>
+
+  <!-- MAIN VIDEO -->
+  <video
+    id="videoPlayer"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto">
+  </video>
+
+</div>
+
+
+<!-- SMALL BLACK BOTTOM SECTION -->
+
+<div id="bottomSection"></div>
+
+
+<script>
+
+/* VIDEO */
+
+const localVideo=
+  "http://192.168.0.117/video/ADCVideo.mp4";
+
+const player=
+  document.getElementById("videoPlayer");
+
+const background=
+  document.getElementById("videoBackground");
+
+
+/* MAIN VIDEO */
+
+player.src=localVideo;
+
+player.loop=true;
+player.muted=true;
+player.autoplay=true;
+player.playsInline=true;
+
+
+/* BLURRED BACKGROUND VIDEO */
+
+background.src=localVideo;
+
+background.loop=true;
+background.muted=true;
+background.autoplay=true;
+background.playsInline=true;
+
+
+/* START BOTH VIDEOS */
+
+window.addEventListener("load",()=>{
+
+  Promise.all([
+    player.play(),
+    background.play()
+  ]).catch(e=>{
+    console.log(
+      "Autoplay blocked:",
+      e
+    );
+  });
+
+});
+
+
+/* KEEP BACKGROUND VIDEO SYNCHRONIZED */
+
+player.addEventListener("timeupdate",()=>{
+
+  if(
+    Math.abs(
+      background.currentTime -
+      player.currentTime
+    ) > 0.15
+  ){
+
+    background.currentTime=
+      player.currentTime;
+
+  }
+
+});
+
+
+/* CLOCK */
+
+function updateClock(){
+
+  const now=new Date();
+
+  const time=now.toLocaleTimeString(
+    "en-AE",
+    {
+      timeZone:"Asia/Dubai",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit",
+      hour12:true
+    }
+  );
+
+  const date=now.toLocaleDateString(
+    "en-AE",
+    {
+      timeZone:"Asia/Dubai",
+      weekday:"long",
+      day:"2-digit",
+      month:"long",
+      year:"numeric"
+    }
+  );
+
+  const parts=time.split(" ");
+  const p=parts[0].split(":");
+
+  document.getElementById(
+    "clockHour"
+  ).textContent=p[0];
+
+  document.getElementById(
+    "clockMinute"
+  ).textContent=p[1];
+
+  document.getElementById(
+    "clockSecond"
+  ).textContent=p[2];
+
+  document.getElementById(
+    "period"
+  ).textContent=parts[1]||"";
+
+  document.getElementById(
+    "date"
+  ).textContent=date;
+
+}
+
+updateClock();
+
+setInterval(
+  updateClock,
+  1000
+);
+
+
+/* WEATHER */
+
+async function updateTemperature(){
+
+  try{
+
+    const r=await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=24.4539&longitude=54.3773&current=temperature_2m,weather_code,is_day&timezone=Asia%2FDubai",
+      {
+        cache:"no-store"
+      }
+    );
+
+    const d=await r.json();
+
+    const temp=
+      Math.round(
+        d.current.temperature_2m
+      );
+
+    const code=
+      Number(
+        d.current.weather_code
+      );
+
+    const isDay=
+      Number(
+        d.current.is_day
+      )===1;
+
+    let icon="☀️";
+
+    let status="Sunny";
+
+
+    if(code===0){
+
+      icon=
+        isDay
+        ?"☀️"
+        :"🌙";
+
+      status=
+        isDay
+        ?"Sunny"
+        :"Clear night";
+
+    }
+
+    else if(code===1){
+
+      icon=
+        isDay
+        ?"🌤️"
+        :"🌙";
+
+      status="Mainly clear";
+
+    }
+
+    else if(code===2){
+
+      icon=
+        isDay
+        ?"⛅"
+        :"☁️";
+
+      status="Partly cloudy";
+
+    }
+
+    else if(code===3){
+
+      icon="☁️";
+
+      status="Cloudy";
+
+    }
+
+    else if(
+      [45,48].includes(code)
+    ){
+
+      icon="🌫️";
+
+      status="Foggy";
+
+    }
+
+    else if(
+      [
+        51,53,55,56,57,
+        61,63,65,66,67,
+        80,81,82
+      ].includes(code)
+    ){
+
+      icon="🌧️";
+
+      status="Rainy";
+
+    }
+
+    else if(
+      [71,73,75,77,85,86]
+      .includes(code)
+    ){
+
+      icon="🌨️";
+
+      status="Snowy";
+
+    }
+
+    else if(
+      [95,96,99]
+      .includes(code)
+    ){
+
+      icon="⛈️";
+
+      status="Thunderstorm";
+
+    }
+
+
+    document.getElementById(
+      "tempIcon"
+    ).textContent=icon;
+
+    document.getElementById(
+      "temperature"
+    ).textContent=
+      temp+"°C";
+
+    document.getElementById(
+      "weatherStatus"
+    ).textContent=
+      "Abu Dhabi · "+status;
+
+  }
+
+  catch(e){
+
+    document.getElementById(
+      "tempIcon"
+    ).textContent="🌡️";
+
+    document.getElementById(
+      "temperature"
+    ).textContent="--°C";
+
+    document.getElementById(
+      "weatherStatus"
+    ).textContent=
+      "Abu Dhabi · Weather unavailable";
+
+  }
+
+}
+
+updateTemperature();
+
+setInterval(
+  updateTemperature,
+  600000
+);
+
+
+/* CURRENCY */
+
+async function updateCurrency(){
+
+  try{
+
+    const r=await fetch(
+      "https://open.er-api.com/v6/latest/AED",
+      {
+        cache:"no-store"
+      }
+    );
+
+    const d=await r.json();
+
+    if(
+      d.result!=="success" ||
+      !d.rates
+    ){
+
+      throw new Error(
+        "Exchange rate unavailable"
+      );
+
+    }
+
+
+    const currencies=[
+
+      {
+        code:"USD",
+        name:"US DOLLAR",
+        digits:3
+      },
+
+      {
+        code:"MAD",
+        name:"MOROCCAN DIRHAM",
+        digits:3
+      },
+
+      {
+        code:"PHP",
+        name:"PHILIPPINE PESO",
+        digits:2
+      },
+
+      {
+        code:"INR",
+        name:"INDIAN RUPEE",
+        digits:2
+      },
+
+      {
+        code:"JOD",
+        name:"JORDANIAN DINAR",
+        digits:3
+      }
+
+    ];
+
+
+    window.exchangeRates=
+      currencies.map(c=>({
+
+        ...c,
+
+        value:
+          1/
+          Number(
+            d.rates[c.code]
+          )
+
+      }));
+
+
+    window.exchangeIndex=0;
+
+    showNextCurrency();
+
+  }
+
+  catch(e){
+
+    document.getElementById(
+      "currencyValue"
+    ).textContent=
+      "1 AED = USD --";
+
+    document.getElementById(
+      "currencyLabel"
+    ).textContent=
+      "EXCHANGE RATE";
+
+  }
+
+}
+
+
+function showNextCurrency(){
+
+  if(
+    !window.exchangeRates ||
+    !window.exchangeRates.length
+  ){
+
+    return;
+
+  }
+
+
+  const c=
+    window.exchangeRates[
+      window.exchangeIndex
+    ];
+
+
+  document.getElementById(
+    "currencyValue"
+  ).textContent=
+    "1 AED = "+
+    c.code+
+    " "+
+    (1/c.value).toFixed(
+      c.digits
+    );
+
+
+  document.getElementById(
+    "currencyLabel"
+  ).textContent=
+    c.name;
+
+
+  window.exchangeIndex=
+    (
+      window.exchangeIndex+1
+    )%
+    window.exchangeRates.length;
+
+}
+
+
+updateCurrency();
+
+setInterval(
+  updateCurrency,
+  1800000
+);
+
+setInterval(
+  showNextCurrency,
+  4000
+);
+
+</script>
+
+</body>
+</html>
+```
+
+This version keeps the **main video completely uncropped** while the side areas are filled with a blurred version of the same video.
